@@ -16,6 +16,5 @@ It covers the complete user flow from login to logout using Selenium with Python
 - Order confirmation and logout
 - Failure screenshots on error
 - Code organized using POM
-- Data-driven and configurable
 
 ---
