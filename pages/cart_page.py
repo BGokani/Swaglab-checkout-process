@@ -2,6 +2,7 @@ from Shared.CommonFunction import CommonFunction
 from selenium.webdriver.common.by import By
 import random
 
+
 class CartPageLocator:
     btnAddToCart = "shopping_cart_container"
     btnCheckOut = "checkout"
@@ -14,6 +15,7 @@ class CartPageLocator:
     txtLastName = "last-name"
     txtZip = "postal-code"
 
+
 class CartPage(CommonFunction):
 
     @staticmethod
@@ -21,19 +23,32 @@ class CartPage(CommonFunction):
         CommonFunction.driver = driver
 
     def select_on_add_to_cart_item(self, item_name):
+        """ Adds specified items to the cart.
+            Args:
+                item_name (list): List of item names to be added to the cart.
+        """
         for item in item_name:
-            self.click_element(By.XPATH, f"//div[text()='{item}']//ancestor::div[@class='inventory_item_description']//following-sibling::div//button[text()='Add to cart']")
+            self.click_element(By.XPATH,
+                               f"//div[text()='{item}']//ancestor::div[@class='inventory_item_description']//following-sibling::div//button[text()='Add to cart']")
             print(f"Add to cart : {item}")
 
     def select_add_to_cart_item(self):
+        """ Clicks on the cart icon to view added items. """
         self.click_element(By.ID, CartPageLocator.btnAddToCart)
 
     def get_item_prices(self, item_names):
+        """ Retrieves prices of specified items from the cart.
+                Args:
+                    item_names (list): List of item names whose prices need to be retrieved.
+                Returns:
+                    list: List of item prices as strings.
+        """
         prices = []
         for item in item_names:
             try:
                 price_element = self.driver.find_element(
-                    By.XPATH,f"//div[text()='{item}']//ancestor::div[@class='cart_item_label']//following-sibling::div//div[@class='inventory_item_price']"
+                    By.XPATH,
+                    f"//div[text()='{item}']//ancestor::div[@class='cart_item_label']//following-sibling::div//div[@class='inventory_item_price']"
                 )
                 price_text = price_element.text.strip()
                 prices.append(price_text)
@@ -44,9 +59,11 @@ class CartPage(CommonFunction):
         return prices
 
     def click_on_check_out_btn(self):
+        """ Clicks the checkout button to proceed with the purchase. """
         self.click_element(By.ID, CartPageLocator.btnCheckOut)
 
     def input_for_checkout(self):
+        """ Inputs random test data (first name, last name, zip code) in checkout form and clicks continue. """
         firstName = "TC0" + str(random.randint(1, 99))
         lasName = "TC1" + str(random.randint(1, 99))
         zipCode = "3613" + str(random.randint(1, 99))
@@ -58,13 +75,18 @@ class CartPage(CommonFunction):
         self.click_element(By.ID, CartPageLocator.btnContinue)
 
     def get_item_total_price_and_validate(self, expected_prices):
-        #itemTotalPrice = self.driver.find_element(By.XPATH, "//div[@class='summary_subtotal_label']").text
+        """ Validates the total and tax price during checkout.
+               Args:
+                   expected_prices (list): List of expected item prices for validation.
+        """
+        # itemTotalPrice = self.driver.find_element(By.XPATH, "//div[@class='summary_subtotal_label']").text
         taxPrice = self.driver.find_element(By.XPATH, "//div[@class='summary_tax_label']").text
         checkOutPrice = self.driver.find_element(By.XPATH, "//div[@class='summary_total_label']").text
 
         expectedTotalPrice = 0
         for price in expected_prices:
-            expectedTotalPrice += float(price[1:]) # removed last character and add remaining amount. e.g. input: $9 output: 9
+            expectedTotalPrice += float(
+                price[1:])  # removed last character and add remaining amount. e.g. input: $9 output: 9
 
         expectedTotalPrice = "$" + str(expectedTotalPrice)
 
@@ -78,18 +100,15 @@ class CartPage(CommonFunction):
         print("Verify actual and expected checkout price matched : Pass")
 
     def click_on_finish_btn(self):
+        """ Clicks the finish button to complete the checkout process. """
         self.click_element(By.ID, CartPageLocator.btnFinish)
 
     def verify_message(self):
+        """ Verifies the final confirmation message after successful checkout.            """
         self.driver.find_element(By.XPATH, "//div[@id='checkout_complete_container']")
         print("Msg displayed : Thank you for your order!")
 
     def click_on_hamburger_and_logout_btn(self):
-        """ Clicks the hamburger menu and the logout button.
-        """
+        """ Clicks the hamburger menu and the logout button. """
         self.click_element(By.XPATH, CartPageLocator.btnHamburger)
         self.click_element(By.XPATH, CartPageLocator.btnLogout)
-
-
-
-
